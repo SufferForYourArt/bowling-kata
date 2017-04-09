@@ -1,9 +1,7 @@
-package com.me
-
 import org.scalacheck.Gen.choose
 import org.scalatest.PropSpec
 
-object ScorePinsSpec extends PropSpec {
+object BowlingSpec extends PropSpec {
   val validThrow = choose(0, 10)
   val nonStrikeThrow = choose(0, 9)
   val spare = for {
@@ -16,5 +14,4 @@ object ScorePinsSpec extends PropSpec {
 
     fail("here")
   }
-
 }
