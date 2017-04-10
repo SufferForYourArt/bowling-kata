@@ -1,17 +1,24 @@
-import org.scalacheck.Gen.choose
-import org.scalatest.PropSpec
+import org.scalacheck.Gen._
+import org.scalacheck.Properties
+import org.scalacheck.Prop._
 
-object BowlingSpec extends PropSpec {
+class BowlingSpec extends Properties("Bowling") {
   val validThrow = choose(0, 10)
   val nonStrikeThrow = choose(0, 9)
+  val strike = const(10)
+
   val spare = for {
-    shotA <- nonStrikeThrow
-    shotB <- choose(10 - shotA, 10 - shotA)
-  } yield (shotA, shotB)
+    shot1 <- nonStrikeThrow
+    shot2 <- const(10 - shot1)
+  } yield (shot1, shot2)
 
-  property("a single shot should return the amount scored for the number of pins knocked down") {
-    println("n\n\n\n\n\nhere\n\n\n\n\n\n\n")
+  val openFrame = for {
+    shot1 <- nonStrikeThrow
+    shot2 <- choose(0, 9 - shot1)
+  } yield (shot1, shot2)
 
-    fail("here")
-  }
+  val validFrame = for {
+    shot1 <- nonStrikeThrow
+    shot2 <- choose(0, 10 - shot1)
+  } yield (shot1, shot2)
 }
