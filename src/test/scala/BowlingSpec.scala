@@ -114,4 +114,68 @@ class BowlingSpec extends Properties("Bowling") {
       score == 190
     }
   }
+
+  property("12 or more strikes in a row results in a score of 300") = {
+    val strike = 10
+
+    val score = Bowling.scorePins(
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike,
+      strike
+    )
+
+    score == 300
+  }
+
+  property("9 stikes in a row followed by a spare and" +
+  " a valid bowl will result in 270 + the value of the" +
+  " first shot of the spare + the value of the valid bowl") = {
+    forAll(strike, spare, validBowl) {
+      (strike, spare, validBowl) =>
+        val score = Bowling.scorePins(
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          spare._1, spare._2,
+          validBowl
+        )
+        
+        score == 260 + spare._1 + validBowl
+    }
+  }
+
+  property("9 strikes in a row followed by an open frame results in 240 + open frame x2 + opening bowl of open frame") = {
+    forAll(strike, openFrame) {
+      (strike, openFrame) =>
+        val score = Bowling.scorePins(
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          strike,
+          openFrame._1, openFrame._2
+        )
+
+        score == 240 + sum(openFrame) * 2 + sumOpeningBowl(openFrame)
+    }
+  }
 }

@@ -37,25 +37,27 @@ trait Bowling {
 //  }
 
   def scorePins(pinsKnockedDown: Int*): Int = {
-    scoreFirstBowlOfFrame(0, pinsKnockedDown)
+    scoreFirstBowlOfFrame(1, 0, pinsKnockedDown)
   }
 
-  private def scoreFirstBowlOfFrame(totalScore: Int, pinsKnockedDown: Seq[Int]): Int = {
+  private def scoreFirstBowlOfFrame(frame: Int, totalScore: Int, pinsKnockedDown: Seq[Int]): Int = {
     pinsKnockedDown match {
-      case Seq() => totalScore
+      case Nil => totalScore
       case _ => pinsKnockedDown.head match {
-        case 10 => scoreFirstBowlOfFrame(totalScore + scoreStrike(pinsKnockedDown), pinsKnockedDown.drop(1))
-        case _ => scoreSecondBowlOfFrame(totalScore + pinsKnockedDown.head, 10 - pinsKnockedDown.head, pinsKnockedDown.drop(1))
+        case 10 if (frame == 10) => scoreFirstBowlOfFrame(frame, totalScore + 10, pinsKnockedDown.drop(1))
+        case 10 => scoreFirstBowlOfFrame(frame + 1, totalScore + scoreStrike(pinsKnockedDown), pinsKnockedDown.drop(1))
+        case _ => scoreSecondBowlOfFrame(frame, totalScore + pinsKnockedDown.head, 10 - pinsKnockedDown.head, pinsKnockedDown.drop(1))
       }
     }
   }
 
-  private def scoreSecondBowlOfFrame(totalScore: Int, pinsRemaining: Int, pinsKnockedDown: Seq[Int]): Int = {
+  private def scoreSecondBowlOfFrame(frame: Int, totalScore: Int, pinsRemaining: Int, pinsKnockedDown: Seq[Int]): Int = {
     pinsKnockedDown match {
-      case Seq() => totalScore
+      case Nil => totalScore
       case _ => pinsKnockedDown.head match {
-        case `pinsRemaining` => scoreFirstBowlOfFrame(totalScore + scoreSpare(pinsKnockedDown), pinsKnockedDown.drop(1))
-        case _ => scoreFirstBowlOfFrame(totalScore + pinsKnockedDown.head, pinsKnockedDown.drop(1))
+        case `pinsRemaining` if(frame == 10) => scoreFirstBowlOfFrame(frame, totalScore + pinsRemaining, pinsKnockedDown.drop(1))
+        case `pinsRemaining` => scoreFirstBowlOfFrame(frame + 1, totalScore + scoreSpare(pinsKnockedDown), pinsKnockedDown.drop(1))
+        case _ => scoreFirstBowlOfFrame(frame + 1, totalScore + pinsKnockedDown.head, pinsKnockedDown.drop(1))
       }
     }
   }
