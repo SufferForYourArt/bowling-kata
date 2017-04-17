@@ -1,67 +1,79 @@
 package app
 
 trait Bowling {
+//  def scorePins(pinsKnockedDown: Int*): Int = {
+//    var strike = false
+//    var pStrike = false
+//    var spare = false
+//    var total = 0
+//    var previousBowl = 0
+//    var bowlFrameNumber = 1
+//
+//    for( a <- pinsKnockedDown){
+//      if(a==10 && bowlFrameNumber == 1){
+//        strike=true
+//        total += 10
+//      } else {
+//        total += (if(pStrike||strike||spare){a*2}else{a})
+//        pStrike = strike
+//        strike = false
+//        bowlFrameNumber += 1
+//      }
+//
+//      if(bowlFrameNumber == 3 && (previousBowl + a) == 10) {
+//        spare = true
+//      }else{
+//        spare = false
+//      }
+//
+//      if (bowlFrameNumber == 3) {
+//        bowlFrameNumber = 1
+//      }
+//
+//      previousBowl = a
+//    }
+//
+//    total
+//  }
+
   def scorePins(pinsKnockedDown: Int*): Int = {
-    0
+    scoreFirstBowlOfFrame(0, pinsKnockedDown)
   }
 
-  def firstFrameShot()(totalScore: Int)(pinsKnockedDown: Seq[Int]): Int = {
+  private def scoreFirstBowlOfFrame(totalScore: Int, pinsKnockedDown: Seq[Int]): Int = {
     pinsKnockedDown match {
-      case Nil => totalScore
-      case pinsKnockedDown => pinsKnockedDown.head match {
-        case 10 => totalScore + pinsKnockedDown.head + (if (pinsKnockedDown.length > 1) pinsKnockedDown(1) else 0) + (if(pinsKnockedDown.length > 2) pinsKnockedDown(2) else 0)
-        case _ => totalScore + pinsKnockedDown.head
+      case Seq() => totalScore
+      case _ => pinsKnockedDown.head match {
+        case 10 => scoreFirstBowlOfFrame(totalScore + scoreStrike(pinsKnockedDown), pinsKnockedDown.drop(1))
+        case _ => scoreSecondBowlOfFrame(totalScore + pinsKnockedDown.head, 10 - pinsKnockedDown.head, pinsKnockedDown.drop(1))
       }
     }
   }
 
-  def secondFrameShot(pinsRemaining: Int)(totalScore: Int)(pinsKnockedDown: Seq[Int]): Int = {
+  private def scoreSecondBowlOfFrame(totalScore: Int, pinsRemaining: Int, pinsKnockedDown: Seq[Int]): Int = {
     pinsKnockedDown match {
-      case Nil => totalScore
-      case pinsKnockedDown => pinsKnockedDown.head match {
-        case pinsRemaining => totalScore + pinsKnockedDown.head + (if (pinsKnockedDown.length > 1) pinsKnockedDown(1) else 0)
-        case _ => totalScore + pinsKnockedDown.head
+      case Seq() => totalScore
+      case _ => pinsKnockedDown.head match {
+        case `pinsRemaining` => scoreFirstBowlOfFrame(totalScore + scoreSpare(pinsKnockedDown), pinsKnockedDown.drop(1))
+        case _ => scoreFirstBowlOfFrame(totalScore + pinsKnockedDown.head, pinsKnockedDown.drop(1))
       }
     }
   }
 
-  /*def openFrame()(totalScore: Int)(pinsKnockedDown: Seq[Int]): Int = {
-    pinsKnockedDown match {
-      case Nil => totalScore
-      case seq: Seq[Int] => seq.head match {
-        case 10 => strike()(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-        case _ => secondShot(10 - pinsKnockedDown.head)(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-      }
-    }
+  private def scoreStrike(pinsKnockedDown: Seq[Int]): Int = {
+    val nextBowl = if (pinsKnockedDown.length > 1) pinsKnockedDown(1) else 0
+    val bowlAfterNext = if (pinsKnockedDown.length > 2) pinsKnockedDown(2) else 0
+
+    pinsKnockedDown.head + nextBowl + bowlAfterNext
   }
 
-  def strike()(totalScore: Int)(pinsKnockedDown: Seq[Int]): Int = {
-    pinsKnockedDown match {
-      case Nil => totalScore
-      case seq: Seq[Int] => seq.head match {
-        case 10 => strike()(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-        case _ => secondShot(10 - pinsKnockedDown.head)(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-      }
-    }
-  }
+  private def scoreSpare(pinsKnockedDown: Seq[Int]): Int = {
+    val nextBowl = if (pinsKnockedDown.length > 1) pinsKnockedDown(1) else 0
 
-  def spare()(totalScore: Int)(pinsKnockedDown: Seq[Int]): Int = {
-    pinsKnockedDown match {
-      case Nil => totalScore
-      case seq: Seq[Int] => seq.head match {
-        case 10 => strike()(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-        case _ => secondShot(10 - pinsKnockedDown.head)(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-      }
-    }
+    pinsKnockedDown.head + nextBowl
   }
+}
 
-  def secondShot(pinsRemaining: Int)(totalScore: Int)(pinsKnockedDown: Seq[Int]): Int = {
-    pinsKnockedDown match {
-      case Nil => totalScore
-      case seq: Seq[Int] => seq.head match {
-        case `pinsRemaining` => spare()(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-        case _ => openFrame()(totalScore + pinsKnockedDown.head + pinsKnockedDown(1) + pinsKnockedDown(2))(pinsKnockedDown.drop(0))
-      }
-    }
-  }*/
+object Bowling extends Bowling {
+
 }
