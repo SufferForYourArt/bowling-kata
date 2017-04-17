@@ -44,7 +44,7 @@ trait Bowling {
     pinsKnockedDown match {
       case Nil => totalScore
       case _ => pinsKnockedDown.head match {
-        case 10 if (frame == 10) => scoreFirstBowlOfFrame(frame, totalScore + 10, pinsKnockedDown.drop(1))
+        case 10 if (frame == 10) => scoreSecondBowlOfFrame(frame, totalScore + 10, 10, pinsKnockedDown.drop(1))
         case 10 => scoreFirstBowlOfFrame(frame + 1, totalScore + scoreStrike(pinsKnockedDown), pinsKnockedDown.drop(1))
         case _ => scoreSecondBowlOfFrame(frame, totalScore + pinsKnockedDown.head, 10 - pinsKnockedDown.head, pinsKnockedDown.drop(1))
       }
@@ -55,12 +55,19 @@ trait Bowling {
     pinsKnockedDown match {
       case Nil => totalScore
       case _ => pinsKnockedDown.head match {
-        case `pinsRemaining` if(frame == 10) => scoreFirstBowlOfFrame(frame, totalScore + pinsRemaining, pinsKnockedDown.drop(1))
+        case `pinsRemaining` if(frame == 10) => scoreThirdBowlOfFrame(frame, totalScore + pinsRemaining, pinsKnockedDown.drop(1))
         case `pinsRemaining` => scoreFirstBowlOfFrame(frame + 1, totalScore + scoreSpare(pinsKnockedDown), pinsKnockedDown.drop(1))
         case _ => scoreFirstBowlOfFrame(frame + 1, totalScore + pinsKnockedDown.head, pinsKnockedDown.drop(1))
       }
     }
   }
+
+  private def scoreThirdBowlOfFrame(frame: Int, totalScore: Int, pinsKnockedDown: Seq[Int]): Int = {
+    pinsKnockedDown match {
+      case Nil => totalScore
+      case _ => totalScore + pinsKnockedDown.head
+    }
+  } 
 
   private def scoreStrike(pinsKnockedDown: Seq[Int]): Int = {
     val nextBowl = if (pinsKnockedDown.length > 1) pinsKnockedDown(1) else 0

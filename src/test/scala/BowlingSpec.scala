@@ -1,12 +1,14 @@
 package test
 
 import app.Bowling
+import org.scalacheck.Gen
 import org.scalacheck.Gen._
 import org.scalacheck.Prop._
 import org.scalacheck.Properties
 
 class BowlingSpec extends Properties("Bowling") {
   val strike = const(10)
+  val strikeSeq = Gen.containerOf[Seq, Int](strike)
   val validBowl = choose(0, 10)
   val nonStrikeBowl = choose(0, 9)
 
@@ -116,24 +118,13 @@ class BowlingSpec extends Properties("Bowling") {
   }
 
   property("12 or more strikes in a row results in a score of 300") = {
-    val strike = 10
-
-    val score = Bowling.scorePins(
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike,
-      strike
-    )
-
-    score == 300
+    forAll(strikeSeq) {
+      (strikes) =>
+        strikes.length >= 12 ==> {
+          val score = Bowling.scorePins(strikes:_*)
+          score == 300
+        }
+    }
   }
 
   property("9 stikes in a row followed by a spare and" +
